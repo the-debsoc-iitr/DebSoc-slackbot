@@ -1,6 +1,6 @@
 {
   "name": "bot",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "author": "DebSoc_IITR <debsoc@iitr.ac.in>",
   "description": "The bot to manage debates in IITR",
