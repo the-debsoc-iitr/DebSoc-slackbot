@@ -4,17 +4,31 @@
 #This bot can also be called for cancelling the debate
 
 module.exports = (robot) ->
+
+    firebase = require("firebase/app")
+    require('firebase/auth');
+    require('firebase/database');
+    config = {
+        apiKey: "apiKey",
+        authDomain: "projectId.firebaseapp.com",
+        databaseURL: "https://database-c8afc.firebaseio.com",
+        storageBucket: "bucket.appspot.com"
+    };
+    firebase.initializeApp(config);
+    database = firebase.database();
+
     robot.respond /call the debate/i, (msg) ->
         name = msg.message.user.name
+        database.ref().set({'debate': 'null'})
         msg.reply "Yes sir " + name + ", right away!"
-        robot.brain.set('debate', null)
         setTimeout ->
-            debate = robot.brain.get('debate')
-            if debate != null
-                names = debate.name
-                msg.reply 'So here we have ' + names + ' for debate'
-            else
-                msg.reply 'Are you kidding, there is no one for a debate'
+            database.ref('/debate').on('value', (snapshot) ->   
+                user = snapshot.val()
+                length = snapshot.numChildren()
+                if length != "null"
+                    msg.reply 'So here we have ' + length + ' for debate'
+                else
+                    msg.reply 'Are you kidding, there is no one for a debate')
         , 10000
 
     robot.respond /cancel the debate/i, (msg) ->
@@ -23,7 +37,8 @@ module.exports = (robot) ->
 
     robot.respond /i am in/i, (msg) ->
         name = msg.message.user.name
-        robot.brain.set('debate', {name: name})
+        ref = database.ref('/debate')
+        ref.set({name:name})
         msg.reply "Hi " + name + ", welcome to the debate"
 
     robot.respond /i am out/i, (msg) ->
