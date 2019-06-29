@@ -5,6 +5,7 @@
   "author": "DebSoc_IITR <debsoc@iitr.ac.in>",
   "description": "The bot to manage debates in IITR",
   "dependencies": {
+    "firebase": "^6.2.4",
     "hubot": "^3.3.2",
     "hubot-diagnostics": "^1.0.0",
     "hubot-google-images": "^0.2.7",
