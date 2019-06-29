@@ -18,31 +18,32 @@ module.exports = (robot) ->
     database = firebase.database();
 
     robot.respond /call the debate/i, (msg) ->
+        date = msg.match[1]
         name = msg.message.user.name
-        database.ref().set({'debate': 'null'})
+        database.ref().update({"debate": "null"})
         msg.reply "Yes sir " + name + ", right away!"
-        setTimeout ->
-            database.ref('/debate').on('value', (snapshot) ->   
-                user = snapshot.val()
-                length = snapshot.numChildren()
-                if length != "null"
-                    msg.reply 'So here we have ' + length + ' for debate'
-                else
-                    msg.reply 'Are you kidding, there is no one for a debate')
-        , 10000
-
-    robot.respond /cancel the debate/i, (msg) ->
-        name = msg.message.user.name
-        msg.reply "Very sorry to inform you that the debate has been called off"
 
     robot.respond /i am in/i, (msg) ->
         name = msg.message.user.name
         ref = database.ref('/debate')
-        ref.set({name:name})
+        ref.update({"#{name}": name})
         msg.reply "Hi " + name + ", welcome to the debate"
 
     robot.respond /i am out/i, (msg) ->
         name = msg.message.user.name
-        debate = robot.brain.get('debate')
-        robot.brain.remove(debate.name)
+        ref = database.ref("/debate/#{name}")
+        ref.remove()
+        ref = database.ref()
+        ref.update({"debate": "null"})
         msg.reply "Ok! Sorry to see you go"
+
+    robot.respond /cancel the debate/i, (msg) ->
+        ref = database.ref()
+        ref.update({"debate": "null"})
+        msg.reply "Now that's a waste of time"
+
+    robot.respond /add (.+) to debsoc/i, (msg) ->
+        name = msg.match[1]
+        ref = database.ref("/Members")
+        ref.update({"#{name}":{Attendance: "0", Speaker: "0", Adjudicator: "0"}})
+        msg.reply "Added " + name + " to DebSoc"
