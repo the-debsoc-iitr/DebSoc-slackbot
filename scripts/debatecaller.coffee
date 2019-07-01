@@ -1,6 +1,7 @@
 # Description:
 #   DebSoc Handler
 #
+# Note:
 #   Remember to always make a team first
 #
 # Dependencies:
@@ -10,7 +11,16 @@
 #   None
 #
 # Commands:
-#   ship it - Display a motivation squirrel
+#   call the debate - initialize a new debate
+#   i am in - add user to debate roster
+#   i am out - remove user from debate roster
+#   cancel the debate - remove the debate instance
+#   set the debate - forms teams, decides adjes and sets up the debate format
+#   set motion(x) abc def - registers motion no. x with title as abc and context as def
+#   show motions - shows the list of motions
+#   score user points - updates user role,adds points to the user in the debate as well as updates total tally
+#   add xyz to debsoc - adds xyz to the member team
+#   archive the debate date - saves a copy of the debate in the database
 #
 # Author:
 #   AyanChoudhary
@@ -33,7 +43,7 @@ module.exports = (robot) ->
     robot.respond /call the debate/i, (msg) ->
         date = msg.match[1]
         name = msg.message.user.name
-        database.ref().update({"debate":{Format: "", Motion: "", Names:""}})
+        database.ref().update({"debate":{Format: "", Motion: "", Names:"", Teams:""}})
         msg.reply "Yes sir " + name + ", right away!"
 
     robot.respond /i am in/i, (msg) ->
@@ -54,6 +64,12 @@ module.exports = (robot) ->
         msg.reply "Now that's a waste of time"
 
     robot.respond /set the debate/i, (msg) ->
+        shuffle = (source) ->
+            return source unless source.length >= 2
+            for index in [source.length-1..1]
+                randomIndex = Math.floor Math.random() * (index + 1)
+                [source[index], source[randomIndex]] = [source[randomIndex], source[index]]
+            source
         ref = database.ref("/debate/Names")
         ref.once("value", (snapshot) -> 
             names = snapshot.val()
@@ -63,23 +79,73 @@ module.exports = (robot) ->
             else if length > 7 and length < 9
                 ref = database.ref("/debate")
                 ref.update({Format: "AP"})
+                Names = []
+                snapshot.forEach((data) ->
+                    Names.push(data.key)
+                    robot.logger.debug(snapshot.keys))
+                Order = shuffle Names
+                slice = length%6
+                chair = Order[-1..]
+                adjes = Order[-slice...-1]
+                team1 = Order[0...3]
+                team2 = Order[3...6]
+                refer = database.ref("/debate/Teams")
+                refer.update(Team1:"#{team1}")
+                refer.update(Team2:"#{team2}")
+                msg.reply "The chair is #{chair}"
+                msg.reply "The adjes are #{adjes}"
+                msg.reply "Team 1 is : #{team1}"
+                msg.reply "Team 2 is : #{team2}"
             else if length > 9 and length < 16
                 ref = database.ref("/debate")
-                ref.update({Format: "BP"}))
+                ref.update({Format: "BP"})
+                Names = []
+                snapshot.forEach((data) ->
+                    Names.push(data.key)
+                    robot.logger.debug(snapshot.keys))
+                Order = shuffle Names
+                slice = length%8
+                chair = Order[-1..]
+                adjes = Order[-slice...-1]
+                team1 = Order[0...2]
+                team2 = Order[2...4]
+                team3 = Order[4...6]
+                team4 = Order[6...8]
+                refer = database.ref("/debate/Teams")
+                refer.update(Team1:"#{team1}")
+                refer.update(Team2:"#{team2}")
+                refer.update(Team3:"#{team3}")
+                refer.update(Team4:"#{team4}")
+                msg.reply "The chair is #{chair}"
+                msg.reply "The adjes are #{adjes}"
+                msg.reply "Team 1 is : #{team1}"
+                msg.reply "Team 2 is : #{team2}"
+                msg.reply "Team 3 is : #{team3}"
+                msg.reply "Team 4 is : #{team4}")
 
-    robot.respond /set motion (.+) (.+)/i, (msg) ->
+    robot.respond /set motion(.+) (.+) (.+)/i, (msg) ->
         number = msg.match[1]
         motion = msg.match[2]
+        context = msg.match[3]
         ref = database.ref("/debate/Motion")
-        ref.update({"Motion#{number}": "#{motion}"})
+        ref.update({"Motion#{number}": {Title:"#{motion}", Context:"#{context}"}})
 
     robot.respond /show motions/i, (msg) -> 
         ref = database.ref("/debate/Motion")
         ref.once("value", (snapshot) ->
             snap = snapshot.val()
-            msg.reply "Motion1: #{snap.Motion1}"
-            msg.reply "Motion2: #{snap.Motion2}"
-            msg.reply "Motion3: #{snap.Motion3}")
+            length = snapshot.numChildren()
+            snapshot.forEach((data) ->
+                msg.reply ""
+                msg.reply "#{data.key}: #{data.val().Title}"
+                if data.val().Context != "-"
+                    msg.reply "Context: #{data.val().Context}"))
+
+    robot.respond /show people/i, (msg) ->
+        ref = database.ref "/debate/Names"
+        ref.once "value", (snapshot) ->
+            snapshot.forEach((data) ->
+                msg.reply "#{data.key}")
 
     robot.respond /score (.+) (.+)/i, (msg) ->
         name = msg.match[1]
@@ -107,6 +173,13 @@ module.exports = (robot) ->
                 ref.update({Score: "#{mark}"})
                 ref.update({Count: "#{setcount}"}))
 
+    robot.respond /archive the debate (.+)/i, (msg) ->
+        date = msg.match[1]
+        ref = database.ref("/debate")
+        ref.once("value", (snapshot) -> 
+            debate = snapshot.val()
+            ref.update({"Debate #{date}":"#{debate}"}))
+        msg.reply "Debate archived for #{date}"
 
     robot.respond /add (.+) to debsoc/i, (msg) ->
         name = msg.match[1]
