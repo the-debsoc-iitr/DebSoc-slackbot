@@ -26,6 +26,6 @@
     "npm": "6.9.2"
   },
   "devDependencies": {
-    "coffeescript": "1.12.7"
+    "coffeescript": "^1.12.7"
   }
 }
