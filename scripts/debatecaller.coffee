@@ -76,7 +76,7 @@ module.exports = (robot) ->
             length = snapshot.numChildren()
             if length < 7 
                 msg.send "Not enough people! Cancel the debate"
-            else if length > 7 and length < 9
+            else if length >= 7 and length < 9
                 ref = database.ref("/debate")
                 ref.update({Format: "AP"})
                 Names = []
@@ -96,7 +96,7 @@ module.exports = (robot) ->
                 msg.send "The adjes are #{adjes}"
                 msg.send "Team 1 is : #{team1}"
                 msg.send "Team 2 is : #{team2}"
-            else if length > 9 and length < 16
+            else if length >= 9 and length < 16
                 ref = database.ref("/debate")
                 ref.update({Format: "BP"})
                 Names = []
