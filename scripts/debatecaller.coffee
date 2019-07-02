@@ -44,24 +44,24 @@ module.exports = (robot) ->
         date = msg.match[1]
         name = msg.message.user.name
         database.ref().update({"debate":{Format: "", Motion: "", Names:"", Teams:""}})
-        msg.reply "Yes sir " + name + ", right away!"
+        msg.send "Yes sir " + name + ", right away!"
 
     robot.respond /i am in/i, (msg) ->
         name = msg.message.user.name
         ref = database.ref('/debate/Names')
         ref.update({"#{name}":{Role:"", Score:"0", Count:"0"}})
-        msg.reply "Hi " + name + ", welcome to the debate"
+        msg.send "Hi " + name + ", welcome to the debate"
 
     robot.respond /i am out/i, (msg) ->
         name = msg.message.user.name
         ref = database.ref("/debate/Names/#{name}")
         ref.remove()
-        msg.reply "Ok! Sorry to see you go"
+        msg.send "Ok! Sorry to see you go"
 
     robot.respond /cancel the debate/i, (msg) ->
         ref = database.ref()
         ref.update({"debate": null})
-        msg.reply "Now that's a waste of time"
+        msg.send "Now that's a waste of time"
 
     robot.respond /set the debate/i, (msg) ->
         shuffle = (source) ->
@@ -75,7 +75,7 @@ module.exports = (robot) ->
             names = snapshot.val()
             length = snapshot.numChildren()
             if length < 7 
-                msg.reply "Not enough people! Cancel the debate"
+                msg.send "Not enough people! Cancel the debate"
             else if length > 7 and length < 9
                 ref = database.ref("/debate")
                 ref.update({Format: "AP"})
@@ -92,10 +92,10 @@ module.exports = (robot) ->
                 refer = database.ref("/debate/Teams")
                 refer.update(Team1:"#{team1}")
                 refer.update(Team2:"#{team2}")
-                msg.reply "The chair is #{chair}"
-                msg.reply "The adjes are #{adjes}"
-                msg.reply "Team 1 is : #{team1}"
-                msg.reply "Team 2 is : #{team2}"
+                msg.send "The chair is #{chair}"
+                msg.send "The adjes are #{adjes}"
+                msg.send "Team 1 is : #{team1}"
+                msg.send "Team 2 is : #{team2}"
             else if length > 9 and length < 16
                 ref = database.ref("/debate")
                 ref.update({Format: "BP"})
@@ -116,12 +116,12 @@ module.exports = (robot) ->
                 refer.update(Team2:"#{team2}")
                 refer.update(Team3:"#{team3}")
                 refer.update(Team4:"#{team4}")
-                msg.reply "The chair is #{chair}"
-                msg.reply "The adjes are #{adjes}"
-                msg.reply "Team 1 is : #{team1}"
-                msg.reply "Team 2 is : #{team2}"
-                msg.reply "Team 3 is : #{team3}"
-                msg.reply "Team 4 is : #{team4}")
+                msg.send "The chair is #{chair}"
+                msg.send "The adjes are #{adjes}"
+                msg.send "Team 1 is : #{team1}"
+                msg.send "Team 2 is : #{team2}"
+                msg.send "Team 3 is : #{team3}"
+                msg.send "Team 4 is : #{team4}")
 
     robot.respond /set motion(.+) (.+) (.+)/i, (msg) ->
         number = msg.match[1]
@@ -136,16 +136,16 @@ module.exports = (robot) ->
             snap = snapshot.val()
             length = snapshot.numChildren()
             snapshot.forEach((data) ->
-                msg.reply ""
-                msg.reply "#{data.key}: #{data.val().Title}"
+                msg.send ""
+                msg.send "#{data.key}: #{data.val().Title}"
                 if data.val().Context != "-"
-                    msg.reply "Context: #{data.val().Context}"))
+                    msg.send "Context: #{data.val().Context}"))
 
     robot.respond /show people/i, (msg) ->
         ref = database.ref "/debate/Names"
         ref.once "value", (snapshot) ->
             snapshot.forEach((data) ->
-                msg.reply "#{data.key}")
+                msg.send "#{data.key}")
 
     robot.respond /score (.+) (.+)/i, (msg) ->
         name = msg.match[1]
@@ -192,10 +192,10 @@ module.exports = (robot) ->
         ref.once("value", (snapshot) -> 
             snapshot.forEach((data) ->
                 refer.child("/Teams").update({"#{data.key}":"#{data.val()}"})))
-        msg.reply "Debate archived for #{date}"
+        msg.send "Debate archived for #{date}"
 
     robot.respond /add (.+) to debsoc/i, (msg) ->
         name = msg.match[1]
         ref = database.ref("/Members")
         ref.update({"#{name}":{Attendance: "0", Speaker: "0", Adjudicator: "0"}})
-        msg.reply "Added " + name + " to DebSoc"
+        msg.send "Added " + name + " to DebSoc"
