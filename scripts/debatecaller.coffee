@@ -43,20 +43,23 @@ module.exports = (robot) ->
     robot.respond /call the debate/i, (msg) ->
         date = msg.match[1]
         name = msg.message.user.name
-        database.ref().update({"debate":{Format: "", Motion: "", Names:"", Teams:""}})
+        database.ref().update({"debate":{Format: "", Motion: "", Names:"", Teams:"", Absent:""}})
         msg.send "Yes sir " + name + ", right away!"
         msg.send "@channel The debate has been called"
 
     robot.respond /i am in/i, (msg) ->
         name = msg.message.user.name
-        ref = database.ref('/debate/Names')
+        ref = database.ref("/debate/Names")
         ref.update({"#{name}":{Role:"", Score:"0", Count:"0"}})
         msg.send "Hi " + name + ", welcome to the debate"
 
-    robot.respond /i am out/i, (msg) ->
+    robot.respond /i am out (.*)/i, (msg) ->
+        reason = msg.match[1]
         name = msg.message.user.name
         ref = database.ref("/debate/Names/#{name}")
         ref.remove()
+        ref = database.ref("/debate/Absent")
+        ref.update "#{name}":"#{reason}"
         msg.send "Ok! Sorry to see you go"
 
     robot.respond /cancel the debate/i, (msg) ->
