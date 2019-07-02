@@ -178,7 +178,20 @@ module.exports = (robot) ->
         ref = database.ref("/debate")
         ref.once("value", (snapshot) -> 
             debate = snapshot.val()
-            ref.update({"Debate #{date}":"#{debate}"}))
+            ref.update({"Debate#{date}":{Format:"#{debate.Format}", Motion:"", Team:"", Names:""}))
+        refer = database.ref("/Debate#{date}")
+        ref = database.ref("/debate/Names")
+        ref.once("value", (snapshot) ->
+            snapshot.forEach((data) ->
+                refer.child("/Names").update({"#{data.key}":{Role:"#{data.val().Role}", Score:"#{data.val().Score}"}}))
+        ref = database.ref("/debate/Motions")
+        ref.once("value", (snapshot) ->
+            snapshot.forEach((data) ->
+                refer.child("/Motions").update({"#{data.key}":{Title:"#{data.val().Title}", Context:"#{data.val().Context}"}})))
+        ref = database.ref("/debate/Teams")
+        ref.once("value", (snapshot) -> 
+            snapshot.forEach((data) ->
+                refer.child("/Teams").update({"#{data.key}":"#{data.val()}"})))
         msg.reply "Debate archived for #{date}"
 
     robot.respond /add (.+) to debsoc/i, (msg) ->
