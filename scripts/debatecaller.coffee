@@ -45,6 +45,7 @@ module.exports = (robot) ->
         name = msg.message.user.name
         database.ref().update({"debate":{Format: "", Motion: "", Names:"", Teams:""}})
         msg.send "Yes sir " + name + ", right away!"
+        msg.send "@channel The debate has been called"
 
     robot.respond /i am in/i, (msg) ->
         name = msg.message.user.name
