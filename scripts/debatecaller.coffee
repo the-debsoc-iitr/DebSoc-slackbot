@@ -183,7 +183,7 @@ module.exports = (robot) ->
         ref = database.ref("/debate/Names")
         ref.once("value", (snapshot) ->
             snapshot.forEach((data) ->
-                refer.child("/Names").update({"#{data.key}":{Role:"#{data.val().Role}", Score:"#{data.val().Score}"}}))
+                refer.child("/Names").update({"#{data.key}":{Role:"#{data.val().Role}", Score:"#{data.val().Score}"}})))
         ref = database.ref("/debate/Motions")
         ref.once("value", (snapshot) ->
             snapshot.forEach((data) ->
