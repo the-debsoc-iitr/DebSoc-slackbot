@@ -60,7 +60,7 @@ module.exports = (robot) ->
 
     robot.respond /cancel the debate/i, (msg) ->
         ref = database.ref()
-        ref.update({"debate": "null"})
+        ref.update({"debate": null})
         msg.reply "Now that's a waste of time"
 
     robot.respond /set the debate/i, (msg) ->
