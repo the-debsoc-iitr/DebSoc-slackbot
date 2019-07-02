@@ -33,8 +33,8 @@ module.exports = (robot) ->
     require('firebase/database');
     config = {
         apiKey: "apiKey",
-        authDomain: "projectId.firebaseapp.com",
-        databaseURL: "https://database-c8afc.firebaseio.com",
+        authDomain: "debate-database.firebaseapp.com",
+        databaseURL: "https://debate-database.firebaseio.com",
         storageBucket: "bucket.appspot.com"
     };
     firebase.initializeApp(config);
