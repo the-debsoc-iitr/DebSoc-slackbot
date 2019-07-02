@@ -43,7 +43,7 @@ module.exports = (robot) ->
     robot.respond /call the debate/i, (msg) ->
         date = msg.match[1]
         name = msg.message.user.name
-        database.ref().update({"debate":{Format: "", Motion: "", Names:"", Teams:"", Absent:""}})
+        database.ref().update({"debate":{Format: "", Motion: "", Names:"", Teams:"", Absent:"", Caller:"#{name}"}})
         msg.send "Yes sir " + name + ", right away!"
         msg.send "@channel The debate has been called"
 
@@ -64,8 +64,15 @@ module.exports = (robot) ->
 
     robot.respond /cancel the debate/i, (msg) ->
         ref = database.ref()
-        ref.update({"debate": null})
-        msg.send "Now that's a waste of time"
+        name = msg.message.user.name
+        refer = database.ref("/debate/Caller")
+        refer.once("value", (snapshot) ->
+            caller = snapshot.val()
+            if  caller == name
+                ref.update({"debate": null})
+                msg.send "Now that's a waste of time"
+            else
+                msg.send "Why are you cancelling when you didn't call it?")
 
     robot.respond /set the debate/i, (msg) ->
         shuffle = (source) ->
