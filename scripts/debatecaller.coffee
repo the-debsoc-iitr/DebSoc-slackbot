@@ -178,7 +178,7 @@ module.exports = (robot) ->
         ref = database.ref("/debate")
         ref.once("value", (snapshot) -> 
             debate = snapshot.val()
-            ref.update({"Debate#{date}":{Format:"#{debate.Format}", Motion:"", Team:"", Names:""}))
+            ref.update({"Debate#{date}":{Format:"#{debate.Format}", Motion:"", Team:"", Names:""}}))
         refer = database.ref("/Debate#{date}")
         ref = database.ref("/debate/Names")
         ref.once("value", (snapshot) ->
