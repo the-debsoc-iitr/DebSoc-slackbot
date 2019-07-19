@@ -171,7 +171,7 @@
       "integrity": "sha1-6RHnQaCtLiTSnm+rLPifoyLVnHY="
     },
     "coffeescript": {
-      "version": "1.6.3",
+      "version": "1.12.7",
       "resolved": "https://registry.npmjs.org/coffeescript/-/coffeescript-1.6.3.tgz",
       "integrity": "sha1-QXSXUMYhplU8fAOBilOEuyTDBUE="
     },
